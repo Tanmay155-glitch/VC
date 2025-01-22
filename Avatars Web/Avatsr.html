@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Website with 3D Avatar</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@readyplayerme/viewer@0.1.2/build/readyplayerme.min.js"></script>
+  <style>
+    :root {
+      --primary-color: #4CAF50;
+      --secondary-color: #ffffff;
+      --background-color: #f4f4f4;
+      --accent-color: #ff9800;
+      --text-color: #333;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      background-color: var(--background-color);
+      color: var(--text-color);
+      line-height: 1.6;
+    }
+
+    header {
+      background-color: var(--primary-color);
+      color: var(--secondary-color);
+      padding: 1rem 0;
+      text-align: center;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .logo {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      align-items: center;
+    }
+
+    .logo img {
+      height: 50px;
+      width: 50px;
+    }
+
+    .logo span {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-left: 0.5rem;
+      color: var(--secondary-color);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+    }
+
+    .avatar-section {
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .avatar-section h2 {
+      color: var(--primary-color);
+      font-size: clamp(1.5rem, 3vw, 2rem);
+    }
+
+    .avatar-container {
+      max-width: 90%;
+      margin: 2rem auto;
+      border: 2px solid var(--primary-color);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    iframe {
+      width: 100%;
+      height: 50vh;
+      border: none;
+    }
+
+    footer {
+      text-align: center;
+      background-color: var(--primary-color);
+      color: var(--secondary-color);
+      padding: 1rem 0;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      font-size: 0.9rem;
+    }
+
+    button {
+      padding: 0.8rem 1.5rem;
+      font-size: 1rem;
+      margin: 1rem auto;
+      color: var(--secondary-color);
+      background-color: var(--accent-color);
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #e67e22;
+    }
+
+    #download-btn {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      iframe {
+        height: 40vh;
+      }
+
+      button {
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .avatar-section {
+        padding: 1rem;
+      }
+
+      iframe {
+        height: 30vh;
+      }
+
+      button {
+        padding: 0.5rem 0.8rem;
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <img src="Heroic_Logo.webp" alt="Heroic Logo">
+      <span>Heroic 3D</span>
+    </div>
+    <h1>Welcome to My Interactive Website</h1>
+  </header>
+
+  <section class="avatar-section">
+    <h2>3D Avatar</h2>
+    <div id="avatar-container" class="avatar-container">
+      <!-- Ready Player Me Avatar Embedded -->
+      <iframe 
+        src="https://readyplayer.me/avatar?frameApi" 
+        id="3d-avatar" 
+        title="3D Avatar" 
+        allow="fullscreen; autoplay; encrypted-media">
+      </iframe>
+    </div>
+    <button onclick="reloadAvatar()">Reload Avatar</button>
+    <button id="download-btn">Download Avatar</button>
+  </section>
+
+  <footer>
+    <p>&copy; 2024 Gawali Tanmay Subhash. All rights reserved.</p>
+  </footer>
+
+  <script>
+    // Script to interact with the Ready Player Me iframe API
+    const iframe = document.getElementById('3d-avatar');
+    const downloadBtn = document.getElementById('download-btn');
+
+    let avatarUrl = '';
+
+    window.addEventListener('message', (event) => {
+      if (event.data.type === 'ready') {
+        iframe.contentWindow.postMessage(
+          {
+            target: 'readyplayerme',
+            type: 'subscribe',
+            eventName: 'avatar:exported',
+          },
+          '*'
+        );
+      }
+
+      if (event.data.type === 'avatar:exported') {
+        avatarUrl = event.data.data.url; // Get the URL of the exported avatar
+        downloadBtn.style.display = 'inline-block';
+        downloadBtn.onclick = () => {
+          const a = document.createElement('a');
+          a.href = avatarUrl;
+          a.download = 'avatar.glb';
+          a.click();
+        };
+      }
+    });
+
+    function reloadAvatar() {
+      iframe.src = "https://readyplayer.me/avatar?frameApi";
+      downloadBtn.style.display = 'none';
+    }
+  </script>
+</body>
+</html>
